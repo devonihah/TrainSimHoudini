@@ -10,11 +10,13 @@ frameNum = 1
 redTrainNull = hou.node('/obj').createNode('null', 'null1', 0)
 
 def setTrainMovement(movement):
+    print(movement)
     global redTrainStop
-    if movement == -1:
-        redTrainStop = False
-    else:
-        redTrainStop = True
+    print(str(redTrainStop))
+    #if movement == -1:
+    #    redTrainStop = False
+    #else:
+    #    redTrainStop = True
 
 def setXY(x, z):
     x *= 10
@@ -31,19 +33,19 @@ def setFrame():
 def setRedTrainSpeed(speed):
     frameNum = float(redTrainNull.parm('rx').eval())
     redTrainSpeed = float(redTrainNull.parm('ry').eval())
-    global redTrainSpeed, frameNum
+    global redTrainSpeed, frameNum, redTrainStop
     if frameNum == hou.frame():
         pass
     elif frameNum > hou.frame():
         while frameNum > hou.frame():
             frameNum -= 1
-            if redtrainStop == False:
-                redTrainSpeed -= speed
+            #if redtrainStop == False:
+            redTrainSpeed -= speed
     elif frameNum < hou.frame():
         while frameNum < hou.frame():
             frameNum += 1
-            if redTrainStop == False:
-                redTrainSpeed += speed
+            #if redTrainStop == False:
+            redTrainSpeed += speed
     redTrainNull.parm('rx').set(frameNum)
     redTrainNull.parm('ry').set(redTrainSpeed)
     return redTrainSpeed
@@ -385,11 +387,3 @@ objectMerge.parm('objpath1').set('/obj/geo2')
 #C:\Users\devon\OneDrive\Documents\Scripting for Animation
 
 #UP TO THIS POINT IT SETS THE GEOMETRY FOR ONE TRAIN TO MOVE AROUND A CURVE
-
-
-
-
-
-
-
-
