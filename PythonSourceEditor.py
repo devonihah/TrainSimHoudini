@@ -50,10 +50,12 @@ def setRedTrainSpeed(speed):
     redTrainNull.parm('ry').set(redTrainSpeed)
     return redTrainSpeed
 
-    
+
+totalTrainsToCreate = 2
+trainColors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'white', 'black']
+
+
 geo = hou.node('/obj').createNode('geo', 'geo1', 0)
-
-
 
 curve = geo.createNode('curve', 'curve1', 0)
 curve.parm('coords').set(setXY(0,0) + ' ' + setXY(1,0) + ' ' + setXY(1,1) + ' ' + setXY(2,1) + ' ' + setXY(2,2) + ' ' + setXY(0,2) + ' ' + setXY(0,1))
@@ -98,6 +100,22 @@ trainFilePath = 'C:/Users/devon/OneDrive/Documents/Scripting for Animation/train
 #trainFilePath = 'C:/Users/dtennis/Downloads/trainCarUpdated(notProcedural).fbx'
 
 #CREATE TRAIN CARS AND ALL OF THEIR TRANSFORMS
+numTrainsToMake = 7
+redTrainArray = []
+redTrainOffset = 6.3
+redTrainPos = 0
+redTrainSize = 0.2
+for i in range(numTrainsToMake):
+    trainCar = geo.createNode('file', 'file' + str(i), 0)
+    trainCar.parm('file').set(trainFilePath)
+    transform = geo.createNode('xform', 'xform' + str(i), 0)
+    transform.parm('sx').set(str(redTrainSize))
+    transform.parm('sy').set(str(redTrainSize))
+    transform.parm('sz').set(str(redTrainSize))
+    transform.parm('tz').set(str(redTrainPos))
+    transform.setInput(0, trainCar, 0)
+    redTrainArray.append(transform)
+    redTrainPos += redTrainOffset
 
 trainCar1 = geo.createNode('file', 'file1', 0)
 trainCar1.parm('file').set(trainFilePath)
@@ -173,14 +191,18 @@ trainFinderAttrib.parm('snippet').setExpression(trainFinderAttribString)
 trainFinderAttrib.setInput(0, trainFinderRed, 0)
 
 xformTrainFinder = geo.createNode('xform', 'xformPoint', 0)
-xformTrainFinder.parm('tz').set('50')
+xformTrainFinder.parm('tz').set(str(redTrainOffset + 5)
 xformTrainFinder.setInput(0, trainFinderAttrib, 0)
 
-trainFinderGroup = geo.createNode('groupcreate', 'stoppingPoint', 0)
+trainFinderGroup = geo.createNode('groupcreate', 'stoppingPointRed', 0)
 trainFinderGroup.parm('grouptype').set('point')
 trainFinderGroup.setInput(0, xformTrainFinder, 0)
 
 merge1 = geo.createNode('merge', 'merge1', 0)
+for i in range(numTrainsToMake):
+    merge1.setInput(i, redTrainArray[i], 0)
+merg1.setInput(numTrainsToMake, trainFinderGroup, 0)
+
 merge1.setInput(0, transform1, 0)
 merge1.setInput(1, transform2, 0)
 merge1.setInput(2, transform3, 0)
@@ -194,7 +216,7 @@ trainTypeAttrib = geo.createNode('attribcreate', 'attribcreate1', 0)
 trainTypeAttrib.setInput(0, merge1, 0)
 trainTypeAttrib.parm('name1').set('trainType')
 trainTypeAttrib.parm('type1').set('index')
-trainTypeAttrib.parm('string1').set('blue')
+trainTypeAttrib.parm('string1').set('red')
 
 redTrainGroup = geo.createNode('groupcreate', 'group2', 0)
 redTrainGroup.setInput(0, trainTypeAttrib, 0)
@@ -221,7 +243,7 @@ merge3.setInput(1, objectMerge, 0)
 
 pointWrangleRedExpression = 'i@newPoint = nearpoint(0, \'blueTrain\', @P, 30); \nsetpointattrib(0, \'stop\', 18116, i@newPoint, \'set\');'
 pointWrangleRed = geo.createNode('attribwrangle', 'pointwrangleRed', 0)
-pointWrangleRed.parm('group').set('stoppingPoint')
+pointWrangleRed.parm('group').set('stoppingPointRed')
 pointWrangleRed.parm('snippet').setExpression(pointWrangleRedExpression)
 pointWrangleRed.setInput(0, merge3, 0)
 
