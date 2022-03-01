@@ -4,19 +4,21 @@ import sys
 import random as rand
 
 redTrainSpeed = 0.0
-redTrainStop = True
+redTrainStop = False
 frameNum = 1
 
-redTrainNull = hou.node('/obj').createNode('null', 'null1', 0)
+#redTrainNull = hou.node('/obj').createNode('null', 'null1', 0)
+    #frameNum = float(redTrainNull.parm('rx').eval())
+    #redTrainSpeed = float(redTrainNull.parm('ry').eval())
 
 def setTrainMovement(movement):
     print(movement)
     global redTrainStop
-    print(str(redTrainStop))
     #if movement == -1:
     #    redTrainStop = False
     #else:
     #    redTrainStop = True
+    print(str(redTrainStop))
 
 def setXY(x, z):
     x *= 10
@@ -31,42 +33,38 @@ def setFrame():
     return frame
     
 def setRedTrainSpeed(speed):
-    frameNum = float(redTrainNull.parm('rx').eval())
-    redTrainSpeed = float(redTrainNull.parm('ry').eval())
     global redTrainSpeed, frameNum, redTrainStop
     if frameNum == hou.frame():
         pass
     elif frameNum > hou.frame():
         while frameNum > hou.frame():
             frameNum -= 1
-            #if redtrainStop == False:
-            redTrainSpeed -= speed
+            if redtrainStop == False:
+                redTrainSpeed -= speed
     elif frameNum < hou.frame():
         while frameNum < hou.frame():
             frameNum += 1
-            #if redTrainStop == False:
-            redTrainSpeed += speed
-    redTrainNull.parm('rx').set(frameNum)
-    redTrainNull.parm('ry').set(redTrainSpeed)
+            if redTrainStop == False:
+                redTrainSpeed += speed
     return redTrainSpeed
 
 
 totalTrainsToCreate = 2
 trainColors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'white', 'black']
 
-
+#CREATE THE INITIAL NODE FOR THE RED TRAIN
 geo = hou.node('/obj').createNode('geo', 'geo1', 0)
 
-curve = geo.createNode('curve', 'curve1', 0)
-curve.parm('coords').set(setXY(0,0) + ' ' + setXY(1,0) + ' ' + setXY(1,1) + ' ' + setXY(2,1) + ' ' + setXY(2,2) + ' ' + setXY(0,2) + ' ' + setXY(0,1))
-curve.parm('type').set('nurbs')
-curve.parm('close').set(1)
+trackCurve = geo.createNode('curve', 'curve1', 0)
+trackCurve.parm('coords').set(setXY(0,0) + ' ' + setXY(1,0) + ' ' + setXY(1,1) + ' ' + setXY(2,1) + ' ' + setXY(2,2) + ' ' + setXY(0,2) + ' ' + setXY(0,1))
+trackCurve.parm('type').set('nurbs')
+trackCurve.parm('close').set(1)
 
 transformCurve = geo.createNode('xform', 'transformCurve', 0)
 transformCurve.parm('sx').set('5')
 transformCurve.parm('sy').set('5')
 transformCurve.parm('sz').set('5')
-transformCurve.setInput(0, curve, 0)
+transformCurve.setInput(0, trackCurve, 0)
 
 resample1 = geo.createNode('resample', 'resample1', 0)
 resample1.parm('length').set('2.7')
@@ -91,10 +89,6 @@ copyToPoints.setInput(0, trackTransform, 0)
 copyToPoints.setInput(1, orientCurve, 0)
 
 
-
-
-#boxGeo = geo.createNode('box', 'box1', 0)
-
 trainFilePath = 'C:/Users/devon/OneDrive/Documents/Scripting for Animation/trainCarUpdated(notProcedural).fbx'
 
 #trainFilePath = 'C:/Users/dtennis/Downloads/trainCarUpdated(notProcedural).fbx'
@@ -117,69 +111,7 @@ for i in range(numTrainsToMake):
     redTrainArray.append(transform)
     redTrainPos += redTrainOffset
 
-trainCar1 = geo.createNode('file', 'file1', 0)
-trainCar1.parm('file').set(trainFilePath)
-transform1 = geo.createNode('xform', 'transform1', 0)
-transform1.parm('sx').set('0.2')
-transform1.parm('sy').set('0.2')
-transform1.parm('sz').set('0.2')
-transform1.parm('tz').set('31.5')
-transform1.setInput(0, trainCar1, 0)
-
-trainCar2 = geo.createNode('file', 'file2', 0)
-trainCar2.parm('file').set(trainFilePath)
-transform2 = geo.createNode('xform', 'transform2', 0)
-transform2.parm('sx').set('0.2')
-transform2.parm('sy').set('0.2')
-transform2.parm('sz').set('0.2')
-transform2.parm('tz').set('25.2')
-transform2.setInput(0, trainCar2, 0)
-
-trainCar3 = geo.createNode('file', 'file3', 0)
-trainCar3.parm('file').set(trainFilePath)
-transform3 = geo.createNode('xform', 'transform3', 0)
-transform3.parm('sx').set('0.2')
-transform3.parm('sy').set('0.2')
-transform3.parm('sz').set('0.2')
-transform3.parm('tz').set('12.6')
-transform3.setInput(0, trainCar3, 0)
-
-trainCar4 = geo.createNode('file', 'file4', 0)
-trainCar4.parm('file').set(trainFilePath)
-transform4 = geo.createNode('xform', 'transform4', 0)
-transform4.parm('sx').set('0.2')
-transform4.parm('sy').set('0.2')
-transform4.parm('sz').set('0.2')
-transform4.parm('tz').set('6.3')
-transform4.setInput(0, trainCar4, 0)
-
-trainCar5 = geo.createNode('file', 'file5', 0)
-trainCar5.parm('file').set(trainFilePath)
-transform5 = geo.createNode('xform', 'transform5', 0)
-transform5.parm('sx').set('0.2')
-transform5.parm('sy').set('0.2')
-transform5.parm('sz').set('0.2')
-transform5.parm('tz').set('0')
-transform5.setInput(0, trainCar5, 0)
-
-trainCar6 = geo.createNode('file', 'file6', 0)
-trainCar6.parm('file').set(trainFilePath)
-transform6 = geo.createNode('xform', 'transform6', 0)
-transform6.parm('sx').set('0.2')
-transform6.parm('sy').set('0.2')
-transform6.parm('sz').set('0.2')
-transform6.parm('tz').set('37.8')
-transform6.setInput(0, trainCar6, 0)
-
-trainCar7 = geo.createNode('file', 'file7', 0)
-trainCar7.parm('file').set(trainFilePath)
-transform7 = geo.createNode('xform', 'transform7', 0)
-transform7.parm('sx').set('0.2')
-transform7.parm('sy').set('0.2')
-transform7.parm('sz').set('0.2')
-transform7.parm('tz').set('18.9')
-transform7.setInput(0, trainCar7, 0)
-
+#CREATE THE LOCATOR POINT TO FIND THE OTHER TRAINS
 trainFinderRed = geo.createNode('add', 'add1', 0)
 trainFinderRed.parm('points').set('1')
 trainFinderRed.parm('usept0').set('1')
@@ -198,47 +130,48 @@ trainFinderGroup = geo.createNode('groupcreate', 'stoppingPointRed', 0)
 trainFinderGroup.parm('grouptype').set('point')
 trainFinderGroup.setInput(0, xformTrainFinder, 0)
 
-merge1 = geo.createNode('merge', 'merge1', 0)
+#MERGE ALL OF THE TRAIN GEOMETRY
+redTrainCarMerge = geo.createNode('merge', 'redTrainCarMerge', 0)
 for i in range(numTrainsToMake):
-    merge1.setInput(i, redTrainArray[i], 0)
-merg1.setInput(numTrainsToMake, trainFinderGroup, 0)
+    redTrainCarMerge.setInput(i, redTrainArray[i], 0)
+redTrainCarMerge.setInput(numTrainsToMake, trainFinderGroup, 0)
 
-merge1.setInput(0, transform1, 0)
-merge1.setInput(1, transform2, 0)
-merge1.setInput(2, transform3, 0)
-merge1.setInput(3, transform4, 0)
-merge1.setInput(4, transform5, 0)
-merge1.setInput(5, transform6, 0)
-merge1.setInput(6, transform7, 0)
-merge1.setInput(7, trainFinderGroup, 0)
-
-trainTypeAttrib = geo.createNode('attribcreate', 'attribcreate1', 0)
-trainTypeAttrib.setInput(0, merge1, 0)
+#ASSIGN THE TYPE OF TRAIN TO THE TRAIN
+trainTypeAttrib = geo.createNode('attribcreate', 'trainTypeAttrib', 0)
+trainTypeAttrib.setInput(0, redTrainCarMerge, 0)
 trainTypeAttrib.parm('name1').set('trainType')
 trainTypeAttrib.parm('type1').set('index')
 trainTypeAttrib.parm('string1').set('red')
 
+#CREATE A GROUP CONTAINING ALL OF THE TRAIN GEOMETRY AND ASSIGN IT A TYPE
 redTrainGroup = geo.createNode('groupcreate', 'group2', 0)
 redTrainGroup.setInput(0, trainTypeAttrib, 0)
 redTrainGroup.parm('groupname').set('redTrain')
 
+#COLOR THE TRAIN RED
+redTrainColor = geo.createNode('color', 'redTrainColor', 0)
+redTrainColor.parm('colorr').set('1')
+redTrainColor.parm('colorg').set('0')
+redTrainColor.parm('colorb').set('0')
+
+#COMBINE THE TRAIN GEO WITH THE TRACK CURVE
 pathDeform = geo.createNode('pathdeform', 'pathdeform1', 0)
 pathDeform.setInput(0, redTrainGroup, 0)
 pathDeform.setInput(1, transformCurve, 0)
 pathDeform.parm('curve_posoffset').setExpression('speed = .01\nreturn hou.session.setRedTrainSpeed(speed)', language = hou.exprLanguage.Python, replace_expression = True)
 
+#CONNECT THE TRAIN GEOMETRY WITH THE TRACK GEOMETRY
+trainGeoMerge = geo.createNode('merge', 'trainGeoMerge', 0)
+trainGeoMerge.setInput(0, pathDeform, 0)
+trainGeoMerge.setInput(1, copyToPoints, 0)
+trainGeoMerge.setDisplayFlag('on')
 
-#trainTypeAttrib.createPointGroup('blueTrainPoints')
-
-merge2 = geo.createNode('merge', 'merge2', 0)
-merge2.setInput(0, pathDeform, 0)
-merge2.setInput(1, copyToPoints, 0)
-merge2.setDisplayFlag('on')
-
+#BRING IN THE OTHER TRAINS TO BE ABLE TO CHECK THEIR POINTS
 objectMerge = geo.createNode('object_merge', 'object_merge1', 0)
+#THE PATH IS SET FURTHER DOWN AFTER THE OTHER GEOMETRY NODES ARE CREATED
 
 merge3 = geo.createNode('merge', 'merge3', 0)
-merge3.setInput(0, merge2, 0)
+merge3.setInput(0, trainGeoMerge, 0)
 merge3.setInput(1, objectMerge, 0)
 
 pointWrangleRedExpression = 'i@newPoint = nearpoint(0, \'blueTrain\', @P, 30); \nsetpointattrib(0, \'stop\', 18116, i@newPoint, \'set\');'
@@ -256,10 +189,10 @@ redTrainPython.parm('python').set(redTrainPythonCode)
 geo2 = hou.node('/obj').createNode('geo', 'geo2', 0)
 
 
-curve = geo2.createNode('curve', 'curve1', 0)
-curve.parm('coords').set(setXY(0,0) + ' ' + setXY(1,0) + ' ' + setXY(1,1) + ' ' + setXY(2,1) + ' ' + setXY(2,2) + ' ' + setXY(0,2) + ' ' + setXY(0,1))
-curve.parm('type').set('nurbs')
-curve.parm('close').set(1)
+trackCurve = geo2.createNode('curve', 'curve1', 0)
+trackCurve.parm('coords').set(setXY(0,0) + ' ' + setXY(1,0) + ' ' + setXY(1,1) + ' ' + setXY(2,1) + ' ' + setXY(2,2) + ' ' + setXY(0,2) + ' ' + setXY(0,1))
+trackCurve.parm('type').set('nurbs')
+trackCurve.parm('close').set(1)
 
 transformCurve = geo2.createNode('xform', 'transformCurve', 0)
 transformCurve.parm('sx').set('5')
@@ -267,7 +200,7 @@ transformCurve.parm('sy').set('5')
 transformCurve.parm('sz').set('5')
 transformCurve.parm('ry').set('90')
 transformCurve.parm('tz').set('50')
-transformCurve.setInput(0, curve, 0)
+transformCurve.setInput(0, trackCurve, 0)
 
 resample1 = geo2.createNode('resample', 'resample1', 0)
 resample1.parm('length').set('2.7')
