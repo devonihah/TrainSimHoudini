@@ -55,7 +55,7 @@ def setFrame():
     return frame
     
 def setRedTrainSpeed(speed):
-    global redTrainSpeed, redFrameNum, redTrainStop
+    global redTrainSpeed, redFrameNum, redTrainStop, greenTrainStop, blueTrainStop
     if redFrameNum == hou.frame():
         pass
     elif redFrameNum > hou.frame():
@@ -63,10 +63,14 @@ def setRedTrainSpeed(speed):
             redFrameNum -= 1
             if redtrainStop == False:
                 redTrainSpeed -= speed
+            elif greenTrainStop == True and blueTrainStop == True:
+                redTrainSpeed -= speed
     elif redFrameNum < hou.frame():
         while redFrameNum < hou.frame():
             redFrameNum += 1
             if redTrainStop == False:
+                redTrainSpeed += speed
+            elif greenTrainStop == True and blueTrainStop == True:
                 redTrainSpeed += speed
     return redTrainSpeed
 
